@@ -1,0 +1,5 @@
+discord
+pillow
+git+https://github.com/Rapptz/discord-ext-menus
+tenorpy
+pyfiglet
