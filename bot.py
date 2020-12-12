@@ -17,6 +17,37 @@ from PIL import ImageDraw
 from discord.ext import menus
 import tenorpy
 import pyfiglet
+import dbl
+
+
+class TopGG(commands.Cog):
+    
+	def __init__(self, bot):
+		self.bot = bot
+		self.token = os.environ.get('dbl_token')  # set this to your DBL token
+		self.dblpy = dbl.DBLClient(self.bot, self.token)
+		self.update_stats.start()
+
+	def cog_unload(self):
+		self.update_stats.cancel()
+
+	@tasks.loop(minutes=30)
+	async def update_stats(self):
+		"""This function runs every 30 minutes to automatically update your server count."""
+		await self.bot.wait_until_ready()
+		try:
+			server_count = len(self.bot.guilds)
+			await self.dblpy.post_guild_count(server_count)
+			print('Posted server count ({})'.format(server_count))
+		except Exception as e:
+			print('Failed to post server count\n{}: {}'.format(type(e).__name__, e))
+		
+
+
+def setup(bot):
+    bot.add_cog(TopGG(bot))
+
+# Testing if it works!
 
 
 def get_prefix(client , message):
@@ -141,21 +172,21 @@ async def prefix(ctx , prfx:str = ""):
 		await main_server.create_text_channel(name = ctx.guild.id , topic = prfx)
 		await ctx.send(f"Your prefix changes successfully to {prfx}")
 
-@client.event
-async def on_message(message):
-	for member in message.mentions:
-		if member == message.guild.me:
-			embed = discord.Embed(title = "Bot details!!" , color = message.author.color)
-			embed.set_thumbnail(url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
-			prfx = get_prefix(client = client , message = message)
-			embed.add_field(name = "Among Us Unofficial#6602" , value = f"** **" , inline = False)
-			embed.add_field(name = f"Current server prefix = {prfx}" , value = f"currently in {len(client.guilds)} servers" , inline = False)
-			embed.add_field(name = f"For more information use {prfx}help" , value = "`Join the support server here` : [**Click Me**](https://discord.gg/tgyW2Jz)\n`To go to the official website` : [**Click Here**](https://amongusunofficial.godaddysites.com/)" , inline = False)
-			embed.set_footer(text = "Bot developed by @Sammy Sins#6969" , icon_url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
-			await message.channel.send(embed = embed)
+# @client.event
+# async def on_message(message):
+# 	for member in message.mentions:
+# 		if member == message.guild.me:
+# 			embed = discord.Embed(title = "Bot details!!" , color = message.author.color)
+# 			embed.set_thumbnail(url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
+# 			prfx = get_prefix(client = client , message = message)
+# 			embed.add_field(name = "Among Us Unofficial#6602" , value = f"** **" , inline = False)
+# 			embed.add_field(name = f"Current server prefix = {prfx}" , value = f"currently in {len(client.guilds)} servers" , inline = False)
+# 			embed.add_field(name = f"For more information use {prfx}help" , value = "`Join the support server here` : [**Click Me**](https://discord.gg/tgyW2Jz)\n`To go to the official website` : [**Click Here**](https://amongusunofficial.godaddysites.com/)" , inline = False)
+# 			embed.set_footer(text = "Bot developed by @Sammy Sins#6969" , icon_url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
+# 			await message.channel.send(embed = embed)
 
 
-	await client.process_commands(message)
+# 	await client.process_commands(message)
 
 @client.command(aliases = ['Host' , 'HOST'])
 async def host(ctx , matchid:str = '' , server:str = ''):
@@ -192,12 +223,13 @@ async def match(ctx , server:str = ''):
 @client.event
 async def on_ready():
 	change_status.start()
+	setup(client)
 	print("Bot is ready.")
 
 @tasks.loop(minutes=15)
 async def change_status():
 	value = get_count(client)
-	await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening , name = f"{value} users"))
+	await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening , name = f"New Update. Use help command."))
 
 @client.command(aliases = ["Emoji" , "EMOJI"])
 async def emoji(ctx):
@@ -518,19 +550,19 @@ async def guess(ctx):
 
 
 
-@client.command(aliases = ["Stats" , "STATS"])
-async def stats(ctx):
-	users = await get_log_data()
+# @client.command(aliases = ["Stats" , "STATS"])
+# async def stats(ctx):
+# 	users = await get_log_data()
+# 	totalUsers  = get_count(client)
+# 	c_count =  0
+# 	for used in users:
+# 		c_count += users[used]["count"]
 
-	c_count =  0
-	for used in users:
-		c_count += users[used]["count"]
+# 	embed = discord.Embed(title="Among us Bot stats!",description=f"==============\n**Servers** : `{len(client.guilds)}`\n**Commands** : `{c_count}`\n**Users** : `{totalUsers}`\n==============", color=discord.Color.green())
 
-	embed = discord.Embed(title="Among us Bot stats!",description=f"==============\n**Servers** : `{len(client.guilds)}`\n**Commands** : `{c_count}`\n==============", color=discord.Color.green())
+# 	embed.set_thumbnail(url = "https://5droid.ru/uploads/posts/2020-02/1581588210_among-us.png")
 
-	embed.set_thumbnail(url = "https://5droid.ru/uploads/posts/2020-02/1581588210_among-us.png")
-
-	await ctx.send(embed = embed)
+# 	await ctx.send(embed = embed)
 
 @client.command(aliases = ["Mute" , "MUTE"])
 async def mute(ctx):
@@ -644,18 +676,18 @@ async def ping(ctx):
 	await ctx.send(f'Ping: {round(client.latency * 1000)} ms')
 
 
-@client.event
-async def on_guild_join(guild):
-	cnl = client.get_channel(759265178616332308)
-	await cnl.send(f"Among Us bot was added to {guild.name}")
-	embed = discord.Embed(title="Bot details!!", color=discord.Color.orange())
-	embed.set_thumbnail(url="https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
-	prfx = 'a!'
-	embed.add_field(name="Among Us Unofficial#6602", value=f"** **", inline=False)
-	embed.add_field(name=f"Current server prefix = {prfx}", value=f"currently in {len(client.guilds)} servers",inline=False)
-	embed.add_field(name=f"For more information use {prfx}help",value="Join the support server here: [**Click Me**](https://discord.gg/tgyW2Jz)", inline=False)
-	embed.set_footer(text="Bot developed by @Sammy Sins#7295",icon_url="https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
-	await guild.system_channel.send(embed = embed)
+# @client.event
+# async def on_guild_join(guild):
+# 	cnl = client.get_channel(759265178616332308)
+# 	await cnl.send(f"Among Us bot was added to {guild.name}")
+# 	embed = discord.Embed(title="Bot details!!", color=discord.Color.orange())
+# 	embed.set_thumbnail(url="https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
+# 	prfx = 'a!'
+# 	embed.add_field(name="Among Us Unofficial#6602", value=f"** **", inline=False)
+# 	embed.add_field(name=f"Current server prefix = {prfx}", value=f"currently in {len(client.guilds)} servers",inline=False)
+# 	embed.add_field(name=f"For more information use {prfx}help",value="Join the support server here: [**Click Me**](https://discord.gg/tgyW2Jz)", inline=False)
+# 	embed.set_footer(text="Bot developed by @Sammy Sins#7295",icon_url="https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
+# 	await guild.system_channel.send(embed = embed)
 
 @client.command(aliases = ["Imposter" , "IMPOSTER" , "im" , "Im" , "IM"])
 async def imposter(ctx , user : discord.Member = None):
@@ -712,7 +744,7 @@ class testing(menus.Menu):
 		super().__init__(timeout=90.0 , delete_message_after=True)
 
 	async def send_initial_message(self , ctx ,channel):
-		start = discord.Embed(title = 'Among Us Help' , description = 'React below to pick an option\n:radioactive: ➜ Among Us Utilities\n:game_die: ➜ Fun & Games\n:clipboard: ➜ Utilities\n`To join support server` : [Click Here](https://discord.gg/tgyW2Jz)\n`To go to bots website` : [Click Here](https://amongusunofficial.godaddysites.com/)' , color = discord.Color.orange())
+		start = discord.Embed(title = 'Among Us Help' , description = 'React below to pick an option\n:radioactive: ➜ Among Us Utilities\n:game_die: ➜ Fun & Games\n:clipboard: ➜ Utilities\n`Liked the bot? To vote it` : **[Click here](https://top.gg/bot/757272442820362281/vote)**\n`To join support server` : [Click Here](https://discord.gg/tgyW2Jz)\n`To go to bots website` : [Click Here](https://amongusunofficial.godaddysites.com/)\n`To browse through bots code` : [Click Here](https://github.com/Cooldude069/AmongUs.git)' , color = discord.Color.orange())
 		start.set_thumbnail(url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
 		start.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
 
@@ -741,6 +773,13 @@ class testing(menus.Menu):
 		u.set_thumbnail(url = 'https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO')
 		u.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
 		await self.message.edit(embed = u)
+
+	@menus.button('🏠')
+	async def home(self , payload):
+		start = discord.Embed(title = 'Among Us Help' , description = 'React below to pick an option\n:radioactive: ➜ Among Us Utilities\n:game_die: ➜ Fun & Games\n:clipboard: ➜ Utilities\n`Liked the bot? To vote it` : **[Click here](https://top.gg/bot/757272442820362281/vote)**\n`To join support server` : [Click Here](https://discord.gg/tgyW2Jz)\n`To go to bots website` : [Click Here](https://amongusunofficial.godaddysites.com/)\n`To browse through bots code` : [Click Here](https://github.com/Cooldude069/AmongUs.git)' , color = discord.Color.orange())
+		start.set_thumbnail(url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
+		start.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
+		await self.message.edit(embed = start)
 
 	# @menus.button('🏏')
 	# async def crick(self , payload):
@@ -893,12 +932,16 @@ class helper(menus.Menu):
 		i = 5
 
 
-@client.command(aliases=['HELP', 'Help'])
-async def help(ctx):
-	await start_log("help")
-	users = await get_log_data()
-	await update_log("help")
-	m = testing()
-	await m.start(ctx)
+# @client.command(aliases=['HELP', 'Help'])
+# async def help(ctx):
+# 	await start_log("help")
+# 	users = await get_log_data()
+# 	await update_log("help")
+# 	m = testing()
+# 	await m.start(ctx)
 
+
+
+client.load_extension('memes')
+TOKEN = os.environ.get('discord_bot_token')
 client.run(TOKEN)
