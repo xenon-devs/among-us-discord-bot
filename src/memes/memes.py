@@ -9,22 +9,49 @@ from discord.ext import menus
 from io import BytesIO
 import json
 
+def memePath(memeFileName):
+  return os.path.join(os.path.dirname(__file__), 'templates', memeFileName + '.png')
+
+FONT_FILE_PATH = os.path.join(os.path.dirname(__file__), 'arial.ttf')
+
+MEME_TEMPLATES = {
+  ANNOUNCE: memePath('announce'),
+ARMOR: memePath('armor'),
+BASTARDS: memePath('bastards'),
+BOO: memePath('boo'),
+CREWMATE: memePath('crewmate'),
+DRAKE: memePath('drake'),
+FACT: memePath('fact'),
+FBI: memePath('fbi'),
+GOOGLE: memePath('google'),
+MONSTER: memePath('monster'),
+PATRICK: memePath('patrick'),
+PRISON: memePath('prison'),
+SANTA: memePath('santa'),
+SHIT: memePath('shit'),
+SLAP: memePath('slap'),
+SMILE: memePath('smile'),
+SPONGEBOB: memePath('spongebob'),
+SWORD: memePath('sword'),
+UNPLUG: memePath('unplug'),
+WORTHLESS: memePath('worthless')
+}
 
 def get_prefix(client , message):
     main_server = client.get_guild(730075470694973461)
-	# if len(main_server.text_channels) > 480:
-	# 	main_server_2 = client.get_guild(753269919684231178)
-	# 	for channel in main_server_2.text_channels:
-	# 		if str(channel.name) == str(message.guild.id):
-	# 			prfx = channel.topic
-	# 			return prfx
+    # if len(main_server.text_channels) > 480:
+    # 	main_server_2 = client.get_guild(753269919684231178)
+    # 	for channel in main_server_2.text_channels:
+    # 		if str(channel.name) == str(message.guild.id):
+    # 			prfx = channel.topic
+    # 			return prfx
 
 
     for channel in main_server.text_channels:
         try:
-        	if str(channel.name) == str(message.guild.id):
-        		prfx = channel.topic
-        		return prfx
+            if str(channel.name) == str(message.guild.id):
+                prfx = channel.topic
+                return prfx
         except AttributeError:
             return 'a!'
 
@@ -32,42 +59,42 @@ def get_prefix(client , message):
     return basic_prefix
 
 def get_count(client):
-	count = 0
-	for guild in client.guilds:
-		count += guild.member_count
+    count = 0
+    for guild in client.guilds:
+        count += guild.member_count
 
-	return count
+    return count
 
 async def get_log_data():
-	with open("logs.json" , "r") as f:
-		users = json.load(f)
+    with open("logs.json" , "r") as f:
+        users = json.load(f)
 
-	return users
+    return users
 
 async def start_log(command_name):
-	users = await get_log_data()
+    users = await get_log_data()
 
-	if command_name in users:
-		return False
-	else:
-		users[command_name] = {}
-		users[command_name]["count"] = 0
+    if command_name in users:
+        return False
+    else:
+        users[command_name] = {}
+        users[command_name]["count"] = 0
 
-	with open("logs.json" , "w") as f:
-		json.dump(users,f)
-	return True
+    with open("logs.json" , "w") as f:
+        json.dump(users,f)
+    return True
 
 async def update_log(command_name):
-	users = await get_log_data()
+    users = await get_log_data()
 
-	users[command_name]["count"] += 1
+    users[command_name]["count"] += 1
 
-	with open("logs.json" , "w") as f:
-		json.dump(users,f)
+    with open("logs.json" , "w") as f:
+        json.dump(users,f)
 
-	bal = users[command_name]["count"]
+    bal = users[command_name]["count"]
 
-	return bal
+    return bal
 
 class Helpfunc(menus.Menu):
     def __init__(self , client):
@@ -119,8 +146,8 @@ class Helpfunc(menus.Menu):
         else:
             description = '''```
         .--------.
-       / .------. \ 
-      / /        \ \ 
+       / .------. \
+      / /        \ \
       | |        | |
      _| |________| |_
     .'|_|        |_| '.
@@ -131,7 +158,7 @@ class Helpfunc(menus.Menu):
     |   '.'.____.'.'   |
     '.____'.____.'____.'
     '.________________.'```\nUpvote the Bot to access this category.\n`To upvote the Bot ` **[Click Here](https://top.gg/bot/757272442820362281/vote)**'''
-                                            
+
         m = discord.Embed(title = '🤩 Memes' , description = description , color = discord.Color.orange())
         m.set_thumbnail(url = 'https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO')
         m.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
@@ -233,9 +260,9 @@ class Memes(commands.Cog):
         if len(text) > 60:
             return await ctx.send('Your text cannot exceed 60 characters.')
 
-        img = Image.open('unplug.jpg')
+        img = Image.open(MEME_TEMPLATES.UNPLUG)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 15)
+        font = ImageFont.truetype(FONT_FILE_PATH, 15)
         increment = 0
         if len(text) > 30:
             txt = ''
@@ -268,9 +295,9 @@ class Memes(commands.Cog):
         if len(text) > 32:
             return await ctx.send('your text cannot exceed 32 characters.')
 
-        img = Image.open('boo.png')
+        img = Image.open(MEME_TEMPLATES.BOO)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 30)
+        font = ImageFont.truetype(FONT_FILE_PATH , 30)
         increment = 0
         if len(text) > 16:
             while len(text) > 16:
@@ -305,9 +332,9 @@ class Memes(commands.Cog):
         if len(text) > 78:
             return await ctx.send('Your text cannot exceed 78 characters.')
 
-        img = Image.open('fact.jpg')
+        img = Image.open(MEME_TEMPLATES.FACT)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 30)
+        font = ImageFont.truetype(FONT_FILE_PATH , 30)
         increment = 0
         if len(text) > 26:
             txt = ''
@@ -340,9 +367,9 @@ class Memes(commands.Cog):
         if len(text) > 78:
             return await ctx.send('Your text cannot exceed 78 characters.')
 
-        img = Image.open('bastards.jpg')
+        img = Image.open(MEME_TEMPLATES.BASTARDS)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 60)
+        font = ImageFont.truetype(FONT_FILE_PATH , 60)
 
         increment = 0
         if len(text) > 26:
@@ -378,9 +405,9 @@ class Memes(commands.Cog):
 
         if len(text) > 60:
             return await ctx.send('Your text cannot exceed 60 characters')
-        img = Image.open('monster.jpg')
+        img = Image.open(EME_TEMPLATES.MONSTER)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 20)
+        font = ImageFont.truetype(FONT_FILE_PATH , 20)
         increment = 0
         if len(text) > 30:
             txt = ''
@@ -420,11 +447,11 @@ class Memes(commands.Cog):
         if len(text_one) > 42 or len(text_two) > 42:
             return await ctx.send('Your text cannot exceed 48 characters(total of 84 including both).')
 
-        img = Image.open('drake.jpg')
+        img = Image.open(MEME_TEMPLATES.DRAKE)
         draw = ImageDraw.Draw(img)
         t_one = text_one
         t_two = text_two
-        font = ImageFont.truetype('arial.ttf' , 60)
+        font = ImageFont.truetype(FONT_FILE_PATH , 60)
         increment = 0
         if len(t_one) > 14:
             while len(text_one) > 14:
@@ -437,14 +464,14 @@ class Memes(commands.Cog):
         else:
             draw.text((520 , 40) , t_one , (0 , 0, 0),font = font)
 
-        increment = 0 
+        increment = 0
         if len(text_two) > 14:
             while len(text_two) > 14:
                 t_two = text_two[0:13]
                 draw.text((520 , 460 + increment) , t_two , (0 , 0, 0),font = font)
                 increment += 130
                 text_two = text_two[13:]
-            
+
             draw.text((520 , 460 + increment) , text_two , (0 , 0, 0),font = font)
         else:
             draw.text((520 , 460) , t_two , (0 , 0, 0),font = font)
@@ -461,7 +488,7 @@ class Memes(commands.Cog):
         if not voted:
             embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
             return await ctx.send(embed = embed)
-            
+
         if text == '':
             return await ctx.send('You have to provide two texts separated by a ","')
 
@@ -478,9 +505,9 @@ class Memes(commands.Cog):
         if len(text_one) > 10 or len(text_two) > 20:
             return await ctx.send('The first text should not exceed 11 characters and second cannot exceed 21.')
 
-        img = Image.open('sword.jfif')
+        img = Image.open(MEME_TEMPLATES.SWORD)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 40)
+        font = ImageFont.truetype(FONT_FILE_PATH , 40)
         draw.text((132,73) , text_one , (0,0,0) , font = font)
         draw.text((68,273) , text_two , (0,0,0) , font = font)
 
@@ -503,8 +530,8 @@ class Memes(commands.Cog):
         if len(text) > 78:
             return await ctx.send('Your text cannot exceed 78 characters.')
 
-        font = ImageFont.truetype('arial.ttf' , 60)
-        img = Image.open('announce.png')
+        font = ImageFont.truetype(FONT_FILE_PATH , 60)
+        img = Image.open(MEME_TEMPLATES.ANNOUNCE)
         draw = ImageDraw.Draw(img)
         #450 , 80
         #450 , 225
@@ -540,9 +567,9 @@ class Memes(commands.Cog):
         if len(text) > 32:
             return await ctx.send('Your text cannot exceed 32 characters.')
 
-        img = Image.open('fbi.jpg')
+        img = Image.open(MEME_TEMPLATES.FBI)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 60)
+        font = ImageFont.truetype(FONT_FILE_PATH , 60)
 
         draw.text((45,450) , text , (0,0,0) , font = font)
 
@@ -562,8 +589,8 @@ class Memes(commands.Cog):
         if user is None:
             user = ctx.author
 
-        bg = Image.open('worthless.jpg')
-        asset = user.avatar_url_as(format = 'jpg' , size=128)
+        bg = Image.open(MEME_TEMPLATES.WORTHLESS)
+        asset = user.avatar_url_as(format = 'png' , size=128)
         data = BytesIO(await asset.read())
         pfp = Image.open(data)
         pfp = pfp.resize((231,231))
@@ -584,8 +611,8 @@ class Memes(commands.Cog):
         if user is None:
             user = ctx.author
 
-        bg = Image.open('smile.jpg')
-        asset = user.avatar_url_as(format = 'jpg' , size=128)
+        bg = Image.open(MEME_TEMPLATES.SMILE)
+        asset = user.avatar_url_as(format = 'png' , size=128)
         data = BytesIO(await asset.read())
         pfp = Image.open(data)
         pfp = pfp.resize((120,120))
@@ -609,9 +636,9 @@ class Memes(commands.Cog):
         if user == ctx.author:
             return await ctx.send('You cannot slap yourself. Please mention someone else.')
 
-        bg = Image.open('slap.jpg')
-        authorAsset = ctx.author.avatar_url_as(format = 'jpg' , size=128)
-        userAsset = user.avatar_url_as(format = 'jpg' , size=128)
+        bg = Image.open(MEME_TEMPLATES.SLAP)
+        authorAsset = ctx.author.avatar_url_as(format = 'png' , size=128)
+        userAsset = user.avatar_url_as(format = 'png' , size=128)
 
         authorData = BytesIO(await authorAsset.read())
         userData = BytesIO(await userAsset.read())
@@ -641,9 +668,9 @@ class Memes(commands.Cog):
         if len(text) > 60:
             return await ctx.send('your text cannot exceed 60 characters')
 
-        img = Image.open('armor.png')
+        img = Image.open(MEME_TEMPLATES.ARMOR)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , size = 20)
+        font = ImageFont.truetype(FONT_FILE_PATH , size = 20)
         increment = 0
         if len(text) > 20:
             txt = ''
@@ -675,10 +702,10 @@ class Memes(commands.Cog):
             return await ctx.send('You need to pass some text.')
 
         #11 , 130 , 470
-        img = Image.open('patrick.jpg')
-        font = ImageFont.truetype('arial.ttf' , 40)
+        img = Image.open(MEME_TEMPLATES.PATRICK)
+        font = ImageFont.truetype(FONT_FILE_PATH , 40)
         draw = ImageDraw.Draw(img)
-        
+
         if len(text) > 33:
             return await ctx.send('Your text cannot excceed 33 characters.')
 
@@ -715,9 +742,9 @@ class Memes(commands.Cog):
         if len(text) > 52:
             return await ctx.send('Your text cannot exceed 52 characters.')
 
-        img = Image.open('prison.png')
+        img = Image.open(MEME_TEMPLATES.PRISON)
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('arial.ttf' , 20)
+        font = ImageFont.truetype(FONT_FILE_PATH , 20)
         increment = 0
 
         if len(text) > 26:
@@ -748,10 +775,10 @@ class Memes(commands.Cog):
         if text == '':
             return await ctx.send('You need to pass some text.')
 
-        img = Image.open('spongebob.png')
-        font = ImageFont.truetype('arial.ttf' , 30)
+        img = Image.open(MEME_TEMPLATES.SPONGEBOB)
+        font = ImageFont.truetype(FONT_FILE_PATH , 30)
         draw = ImageDraw.Draw(img)
-        
+
         if len(text) > 44:
             return await ctx.send('Your text cannot excceed 44 characters.')
 
@@ -785,10 +812,10 @@ class Memes(commands.Cog):
         if text == '':
             return await ctx.send('You need to pass some text.')
 
-        img = Image.open('shit.jpg')
-        font = ImageFont.truetype('arial.ttf' , 15)
+        img = Image.open(MEME_TEMPLATES.SHIT)
+        font = ImageFont.truetype(FONT_FILE_PATH , 15)
         draw = ImageDraw.Draw(img)
-        
+
         if len(text) > 33:
             return await ctx.send('Your text cannot excceed 33 characters.')
 
@@ -822,10 +849,10 @@ class Memes(commands.Cog):
         if text == '':
             return await ctx.send('You need to pass some text.')
 
-        img = Image.open('santa.jpg')
-        font = ImageFont.truetype('arial.ttf' , 30)
+        img = Image.open(MEME_TEMPLATES.SANTA)
+        font = ImageFont.truetype(FONT_FILE_PATH , 30)
         draw = ImageDraw.Draw(img)
-        
+
         if len(text) > 72:
             return await ctx.send('Your text cannot excceed 72 characters.')
 
@@ -871,6 +898,6 @@ class Memes(commands.Cog):
         await h.start(ctx)
 
 
-        
+
 def setup(client):
     client.add_cog(Memes(client))
