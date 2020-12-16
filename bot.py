@@ -52,18 +52,21 @@ def setup(bot):
 
 def get_prefix(client , message):
 	main_server = client.get_guild(730075470694973461)
-	if len(main_server.text_channels) > 480:
-		main_server_2 = client.get_guild(753269919684231178)
-		for channel in main_server_2.text_channels:
-			if str(channel.name) == str(message.guild.id):
-				prfx = channel.topic
-				return prfx
+	# if len(main_server.text_channels) > 480:
+	# 	main_server_2 = client.get_guild(753269919684231178)
+	# 	for channel in main_server_2.text_channels:
+	# 		if str(channel.name) == str(message.guild.id):
+	# 			prfx = channel.topic
+	# 			return prfx
 
 
 	for channel in main_server.text_channels:
-		if str(channel.name) == str(message.guild.id):
-			prfx = channel.topic
-			return prfx
+		try:
+			if str(channel.name) == str(message.guild.id):
+				prfx = channel.topic
+				return prfx
+		except AttributeError:
+			return 'a!'
 
 	basic_prefix = "a!"
 	return basic_prefix

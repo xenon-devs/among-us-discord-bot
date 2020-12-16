@@ -11,22 +11,25 @@ import json
 
 
 def get_prefix(client , message):
-	main_server = client.get_guild(730075470694973461)
-	if len(main_server.text_channels) > 480:
-		main_server_2 = client.get_guild(753269919684231178)
-		for channel in main_server_2.text_channels:
-			if str(channel.name) == str(message.guild.id):
-				prfx = channel.topic
-				return prfx
+    main_server = client.get_guild(730075470694973461)
+	# if len(main_server.text_channels) > 480:
+	# 	main_server_2 = client.get_guild(753269919684231178)
+	# 	for channel in main_server_2.text_channels:
+	# 		if str(channel.name) == str(message.guild.id):
+	# 			prfx = channel.topic
+	# 			return prfx
 
 
-	for channel in main_server.text_channels:
-		if str(channel.name) == str(message.guild.id):
-			prfx = channel.topic
-			return prfx
+    for channel in main_server.text_channels:
+        try:
+        	if str(channel.name) == str(message.guild.id):
+        		prfx = channel.topic
+        		return prfx
+        except AttributeError:
+            return 'a!'
 
-	basic_prefix = "a!"
-	return basic_prefix
+    basic_prefix = "a!"
+    return basic_prefix
 
 def get_count(client):
 	count = 0
@@ -74,7 +77,7 @@ class Helpfunc(menus.Menu):
         super().__init__(timeout=90.0 , delete_message_after=True)
 
     async def send_initial_message(self , ctx ,channel):
-        start = discord.Embed(title = 'Among Us Help' , description = 'React below to pick an option\n:radioactive: ➜ Among Us Utilities\n:game_die: ➜ Fun & Games\n:clipboard: ➜ Utilities\n🤩 ➜ Memes\n`Liked the bot? To vote it` : **[Click here](https://top.gg/bot/757272442820362281/vote)**\n`To join support server` : [Click Here](https://discord.gg/tgyW2Jz)\n`To go to bots website` : [Click Here](https://amongusunofficial.godaddysites.com/)\n`To browse through bots code` : [Click Here](https://github.com/Cooldude069/AmongUs.git)' , color = discord.Color.orange())
+        start = discord.Embed(title = 'Among Us Help' , description = 'React below to pick an option\n:radioactive: ➜ Among Us Utilities\n:game_die: ➜ Fun & Games\n:clipboard: ➜ Utilities\n🤩 ➜ Memes\n🤖 ➜ Our other bots\n`Liked the bot? To vote it` : **[Click here](https://top.gg/bot/757272442820362281/vote)**\n`To join support server` : [Click Here](https://discord.gg/tgyW2Jz)\n`To go to bots website` : [Click Here](https://cooldude069.github.io/AmongUsUnofficial/index.html)\n`To browse through bots code` : [Click Here](https://github.com/Cooldude069/AmongUs.git)' , color = discord.Color.orange())
         start.set_thumbnail(url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
         start.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
 
@@ -87,6 +90,7 @@ class Helpfunc(menus.Menu):
         au.set_thumbnail(url = 'https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO')
         au.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
         await self.message.edit(embed = au)
+        await self.message.remove_reaction('☢' , self.ctx.author)
 
     @menus.button('🎲')
     async def fng(self , payload):
@@ -95,21 +99,23 @@ class Helpfunc(menus.Menu):
         f.set_thumbnail(url = 'https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO')
         f.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
         await self.message.edit(embed = f)
+        await self.message.remove_reaction('🎲' , self.ctx.author)
 
     @menus.button('📋')
     async def utils(self , payload):
         p = get_prefix(self.client , self.message)
-        u = discord.Embed(title = '📋 Utilities' , description = f'`{p}emoji` ➜ Generates a random Among Us emoji\n`{p}add` ➜ Adds emojis to your server\n`{p}ping` ➜ displays the bots latency\n`{p}prefix <new prefix>` ➜ Changes the bots prefix' , color = discord.Color.orange())
+        u = discord.Embed(title = '📋 Utilities' , description = f'`{p}emoji` ➜ Generates a random Among Us emoji\n`{p}add` ➜ Adds emojis to your server\n`{p}ping` ➜ displays the bots latency\n`{p}prefix <new prefix>` ➜ Changes the bots prefix\n`{p}invite` ➜ Generates an invite link for the bot\n`{p}vote` ➜ Generates a link to vote the bot\n' , color = discord.Color.orange())
         u.set_thumbnail(url = 'https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO')
         u.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
         await self.message.edit(embed = u)
+        await self.message.remove_reaction('📋' , self.ctx.author)
 
     @menus.button('🤩')
     async def mc(self , payload):
         p = get_prefix(self.client , self.message)
         voted = await self.dblpy.get_user_vote(self.ctx.author.id)
         if voted:
-            description = f'`{p}meme` ➜ Fetches a funny meme from Reddit\n`{p}drake <text> , <text>` ➜ Generates a Drake meme\n`{p}sword <text> , <text>`➜ Generates a Sword meme\n`{p}announce <text>` ➜ Generates a Simpson meme.\n`{p}patrick <text>` ➜ Generates a Patrick meme\n`{p}spongebob <text>` ➜ Generates a Spongebob meme\n`{p}shit <text>` ➜ Generates a stepped-in-shit meme\n`{p}santa <text>` ➜ Generates a Santa meme\n`{p}fbi <text>` ➜ Generates an FBI meme\n`{p}slap <user>` ➜ slapping others is fun\n`{p}armor <text>` ➜ Generates an Armor meme\n`{p}monster <text>` ➜ Generates a Monster meme\n`{p}fact <text>` ➜ Generates a fact meme\n'
+            description = f'`{p}meme` ➜ Fetches a funny meme from Reddit\n`{p}drake <text> , <text>` ➜ Generates a Drake meme\n`{p}sword <text> , <text>`➜ Generates a Sword meme\n`{p}announce <text>` ➜ Generates a Simpson meme.\n`{p}patrick <text>` ➜ Generates a Patrick meme\n`{p}spongebob <text>` ➜ Generates a Spongebob meme\n`{p}shit <text>` ➜ Generates a stepped-in-shit meme\n`{p}santa <text>` ➜ Generates a Santa meme\n`{p}fbi <text>` ➜ Generates an FBI meme\n`{p}slap <user>` ➜ slapping others is fun\n`{p}armor <text>` ➜ Generates an Armor meme\n`{p}monster <text>` ➜ Generates a Monster meme\n`{p}fact <text>` ➜ Generates a fact meme\n`{p}unplug <text>` ➜ Generates an Unplugging meme\n`{p}smile <user(optional)>` ➜ Generates a smile meme\n`{p}boo <text>` ➜ Generates a Ghost booing meme\n`{p}bastards <text>` ➜ Those bastards lied to me\n`{p}worthless <user(optional)>` ➜ Generates a This-is-worthless meme\n`{p}prison <text>` ➜ Generates a prison meme\n`{p}google <text>` ➜ Google is down, :(\n'
         else:
             description = '''```
         .--------.
@@ -130,6 +136,15 @@ class Helpfunc(menus.Menu):
         m.set_thumbnail(url = 'https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO')
         m.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
         await self.message.edit(embed = m)
+        await self.message.remove_reaction('🤩' , self.ctx.author)
+
+    @menus.button('🤖')
+    async def hc(self , payload):
+        emb = discord.Embed(title = '🤖 Other bots' , description = 'Wanna play Cricket with your friends?\ndont worry, weve got you covered.\nWith the Hand cricketer bot, you can play cricket with your friends all day long, and if you dont have friends, still weve got you covered.\nTo invite the bot **[Click Here](https://top.gg/bot/709733907053936712)**' , color = discord.Color.orange())
+        emb.set_thumbnail(url = 'https://cdn.discordapp.com/avatars/709733907053936712/0670b3d504ecbe6c4871c6301bf68cea.webp')
+        emb.set_footer(text = 'Bot by Xenon devs' , icon_url = 'https://images-ext-1.discordapp.net/external/-TT71tsZvgEZYaDeq4hH6i3O4WiIQ7c4mYLt8nR7254/https/raw.githubusercontent.com/xenon-devs/xen-assets/main/xen-inc/logo/xen-logo-black-bg.png')
+        await self.message.edit(embed = emb)
+        await self.message.remove_reaction('🤖' , self.ctx.author)
 
     @menus.button('🏠')
     async def home(self , payload):
@@ -137,12 +152,18 @@ class Helpfunc(menus.Menu):
         start.set_thumbnail(url = "https://lh3.googleusercontent.com/VHB9bVB8cTcnqwnu0nJqKYbiutRclnbGxTpwnayKB4vMxZj8pk1220Rg-6oQ68DwAkqO")
         start.set_footer(text = f'Command ran by {self.ctx.author.display_name}')
         await self.message.edit(embed = start)
+        await self.message.remove_reaction('🏠' , self.ctx.author)
 
 class Memes(commands.Cog):
     def __init__(self , client):
         self.client = client
         self.token = os.environ.get('dbl_token')
         self.dblpy = dbl.DBLClient(self.client , self.token)
+        self.reddit = praw.Reddit(client_id = '0bD1UHrRzjDbGQ',
+                                client_secret = '9xoApJv0eZeRr1QVGJJulIE5cjXyFg',
+                                username = 'CooLDuDE-6_9',
+                                password = 'samarth1709',
+                                user_agent = 'AmongUsUnofficial')
 
     @commands.Cog.listener()
     async def on_user_vote(self , data):
@@ -161,29 +182,112 @@ class Memes(commands.Cog):
             embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
             return await ctx.send(embed = embed)
 
-        reddit = praw.Reddit(client_id = '0bD1UHrRzjDbGQ',
-                            client_secret = '9xoApJv0eZeRr1QVGJJulIE5cjXyFg',
-                            username = 'CooLDuDE-6_9',
-                            password = 'samarth1709',
-                            user_agent = 'AmongUsUnofficial')
-
         memeList = []
 
-        dankmemes = reddit.subreddit('dankmemes')
-        hot = dankmemes.hot(limit = 50)
+        dankmemes = self.reddit.subreddit('dankmemes')
+        hot = dankmemes.hot(limit = 25)
         for meme in hot:
             memeList.append(meme)
 
-        rmemes = reddit.subreddit('memes')
-        mHot = rmemes.hot(limit = 50)
+        rmemes = self.reddit.subreddit('memes')
+        mHot = rmemes.hot(limit = 25)
         for nmeme in mHot:
             memeList.append(nmeme)
 
         sendable_meme = random.choice(memeList)
         embed = discord.Embed(description = f'**[{sendable_meme.title}]({sendable_meme.url})**' , color = discord.Color.from_rgb(random.randint(0 , 255), random.randint(0 , 255) ,random.randint(0 , 255)))
         embed.set_image(url = sendable_meme.url)
-        embed.set_footer(text = f'🔥 {sendable_meme.score} | 💬 {len(sendable_meme.comments)}')
+        embed.set_footer(text = f'🔥 {sendable_meme.score}')
         await ctx.send(embed = embed)
+
+    @commands.command(aliases = ["Google" , 'GOOGLE'])
+    async def google(self , ctx , text = None):
+        await start_log("google")
+        await update_log("google")
+        voted = await self.dblpy.get_user_vote(ctx.author.id)
+        print(voted)
+        if not voted:
+            embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
+            return await ctx.send(embed = embed)
+
+        await ctx.send(file = discord.File('google.png'))
+
+    @commands.command(alises = ['Vote' , 'VOTE'])
+    async def vote(self, ctx):
+        embed = discord.Embed(description = '[Upvote The bot here](https://top.gg/bot/757272442820362281/vote)\nAfter upvoting you will get access to the amazing memes category' , color = discord.Color.orange())
+        await ctx.send(embed = embed)
+
+    @commands.command(aliases = ['Unplug' , 'UNPLUG'])
+    async def unplug(self , ctx , * , text = ''):
+        await start_log("unplug")
+        await update_log("unplug")
+        voted = await self.dblpy.get_user_vote(ctx.author.id)
+        print(voted)
+        if not voted:
+            embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
+            return await ctx.send(embed = embed)
+
+        if text == '':
+            return await ctx.send('You need to pass some text.')
+
+        if len(text) > 60:
+            return await ctx.send('Your text cannot exceed 60 characters.')
+
+        img = Image.open('unplug.jpg')
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype('arial.ttf' , 15)
+        increment = 0
+        if len(text) > 30:
+            txt = ''
+            while len(text) > 30:
+                txt = text[0:29]
+                draw.text((375,30+increment) , txt , (0,0,0) , font = font)
+                increment += 30
+                text = text[29:]
+
+            draw.text((375,30+increment) , text , (0,0,0) , font = font)
+        else:
+            draw.text((375,30) , text , (0,0,0) , font = font)
+
+        img.save('unplugout.jpg')
+        await ctx.send(file = discord.File('unplugout.jpg'))
+
+    @commands.command(aliases = ['Boo' , 'BOO'])
+    async def boo(self , ctx , * , text = ''):
+        await start_log("boo")
+        await update_log("boo")
+        voted = await self.dblpy.get_user_vote(ctx.author.id)
+        print(voted)
+        if not voted:
+            embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
+            return await ctx.send(embed = embed)
+
+        if text == '':
+            return await ctx.send('You need to pass some text.')
+
+        if len(text) > 32:
+            return await ctx.send('your text cannot exceed 32 characters.')
+
+        img = Image.open('boo.png')
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype('arial.ttf' , 30)
+        increment = 0
+        if len(text) > 16:
+            while len(text) > 16:
+                txt = ''
+                txt = text[0:15]
+                draw.text((553,660+increment) , txt , (0,0,0) , font = font)
+                increment += 50
+                text = text[15:]
+
+            draw.text((553,660+increment) , text , (0,0,0) , font = font)
+        else:
+            draw.text((553,660) , text , (0,0,0) , font = font)
+
+        img.save('booout.png')
+        await ctx.send(file = discord.File('booout.png'))
+
+
 
     @commands.command(aliases = ['Fact' , 'FACT'])
     async def fact(self , ctx , * , text = ''):
@@ -219,6 +323,44 @@ class Memes(commands.Cog):
 
         img.save('factout.jpg')
         await ctx.send(file = discord.File('factout.jpg'))
+
+    @commands.command(aliases = ['Bastards' , 'BASTARDS'])
+    async def bastards(self , ctx , * , text = ''):
+        await start_log("bastards")
+        await update_log("bastards")
+        voted = await self.dblpy.get_user_vote(ctx.author.id)
+        print(voted)
+        if not voted:
+            embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
+            return await ctx.send(embed = embed)
+
+        if text == '':
+            return await ctx.send('You need to pass some text.')
+
+        if len(text) > 78:
+            return await ctx.send('Your text cannot exceed 78 characters.')
+
+        img = Image.open('bastards.jpg')
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype('arial.ttf' , 60)
+
+        increment = 0
+        if len(text) > 26:
+            txt = ''
+            while len(text) > 26:
+                txt = text[0:25]
+                draw.text((17,17+increment) , txt , (0,0,0) , font = font)
+                increment += 70
+                text = text[25:]
+
+            draw.text((17,17+increment) , text , (0,0,0) , font = font)
+
+        else:
+            draw.text((17,17) , text , (0,0,0) , font = font)
+
+        img.save('bastardsout.jpg')
+        await ctx.send(file = discord.File('bastardsout.jpg'))
+
 
 
     @commands.command(aliases = ['Monster' , 'MONSTER'])
@@ -407,6 +549,50 @@ class Memes(commands.Cog):
         img.save('fbiout.jpg')
         await ctx.send(file = discord.File('fbiout.jpg'))
 
+    @commands.command(aliases = ['Worthless' , 'WORTHLESS'])
+    async def worthless(self , ctx , user:discord.Member = None):
+        await start_log("worthless")
+        await update_log("worthless")
+        voted = await self.dblpy.get_user_vote(ctx.author.id)
+        print(voted)
+        if not voted:
+            embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
+            return await ctx.send(embed = embed)
+
+        if user is None:
+            user = ctx.author
+
+        bg = Image.open('worthless.jpg')
+        asset = user.avatar_url_as(format = 'jpg' , size=128)
+        data = BytesIO(await asset.read())
+        pfp = Image.open(data)
+        pfp = pfp.resize((231,231))
+        bg.paste(pfp,(304,166))
+        bg.save('worthlessout.jpg')
+        await ctx.send(file = discord.File('worthlessout.jpg'))
+
+    @commands.command(aliases = ['Smile' , 'SMILE'])
+    async def smile(self , ctx , user:discord.Member = None):
+        await start_log("slap")
+        await update_log("slap")
+        voted = await self.dblpy.get_user_vote(ctx.author.id)
+        print(voted)
+        if not voted:
+            embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
+            return await ctx.send(embed = embed)
+
+        if user is None:
+            user = ctx.author
+
+        bg = Image.open('smile.jpg')
+        asset = user.avatar_url_as(format = 'jpg' , size=128)
+        data = BytesIO(await asset.read())
+        pfp = Image.open(data)
+        pfp = pfp.resize((120,120))
+        bg.paste(pfp,(150,20))
+        bg.save('smileout.jpg')
+        await ctx.send(file = discord.File('smileout.jpg'))
+
     @commands.command(aliases = ['Slap' , 'SLAP'])
     async def slap(self , ctx , user : discord.Member = None):
         await start_log("slap")
@@ -512,6 +698,42 @@ class Memes(commands.Cog):
 
         img.save('patrickout.jpg')
         await ctx.send(file = discord.File('patrickout.jpg'))
+
+    @commands.command(aliases = ['Prison' , 'PRISON'])
+    async def prison(self, ctx, * , text = ''):
+        await start_log("prison")
+        await update_log("prison")
+        voted = await self.dblpy.get_user_vote(ctx.author.id)
+        print(voted)
+        if not voted:
+            embed = discord.Embed(description = 'You Need to Upvote the bot to use this command.\nTo upvote the bot **[Click Here](https://top.gg/bot/757272442820362281/vote)**' , color = discord.Color.red())
+            return await ctx.send(embed = embed)
+
+        if text == '':
+            return await ctx.send('You need to pass some text.')
+
+        if len(text) > 52:
+            return await ctx.send('Your text cannot exceed 52 characters.')
+
+        img = Image.open('prison.png')
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype('arial.ttf' , 20)
+        increment = 0
+
+        if len(text) > 26:
+            txt = ''
+            while len(text) > 26:
+                txt = text[0:25]
+                draw.text((35,395+increment) , txt , (0,0,0) , font = font)
+                increment += 30
+                text = text[25:]
+
+            draw.text((35,395+increment) , text , (0,0,0) , font = font)
+        else:
+            draw.text((35,395) , text , (0,0,0) , font = font)
+
+        img.save('prisonout.png')
+        await ctx.send(file = discord.File('prisonout.png'))
 
     @commands.command(aliases = ['Spongebob' , 'SPONGEBOB'])
     async def spongebob(self , ctx , * , text = ''):
@@ -632,15 +854,16 @@ class Memes(commands.Cog):
         for used in users:
             c_count += users[used]["count"]
 
-        votes = await self.dblpy.get_bot_upvotes()
+        tp = await self.dblpy.get_bot_info(757272442820362281)
+        votes = tp['points']
 
-        embed = discord.Embed(title="Among us Bot stats!",description=f"==============\n**Servers** : `{len(self.client.guilds)}`\n**Commands** : `{c_count}`\n**Users** : `{totalUsers}`\n**Votes** : `{len(votes)}`\n==============", color=discord.Color.green())
+        embed = discord.Embed(title="Among us Bot stats!",description=f"==============\n**Servers** : `{len(self.client.guilds)}`\n**Commands** : `{c_count}`\n**Users** : `{totalUsers}`\n**Votes** : `{votes}`\n==============", color=discord.Color.green())
 
         embed.set_thumbnail(url = "https://5droid.ru/uploads/posts/2020-02/1581588210_among-us.png")
 
         await ctx.send(embed = embed)
 
-    @commands.command()
+    @commands.command(aliases = ['Help' , 'HELP'])
     async def help(self , ctx):
         await start_log("help")
         await update_log("help")
