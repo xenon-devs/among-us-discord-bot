@@ -946,5 +946,5 @@ class helper(menus.Menu):
 
 
 client.load_extension('memes.memes')
-TOKEN = 'NzYzNzU5MjEwMzk0NTUwMzMy.X38YMQ.aNq1Z2HieEwyP47GOrc-O5Psfpc'
+TOKEN = #Token Here
 client.run(TOKEN)
