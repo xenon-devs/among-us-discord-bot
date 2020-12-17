@@ -20,32 +20,32 @@ import pyfiglet
 import dbl
 
 
-class TopGG(commands.Cog):
+# class TopGG(commands.Cog):
 
-  def __init__(self, bot):
-    self.bot = bot
-    self.token = os.environ.get('dbl_token')  # set this to your DBL token
-    self.dblpy = dbl.DBLClient(self.bot, self.token)
-    self.update_stats.start()
+#   def __init__(self, bot):
+#     self.bot = bot
+#     self.token = os.environ.get('dbl_token')  # set this to your DBL token
+#     self.dblpy = dbl.DBLClient(self.bot, self.token)
+#     self.update_stats.start()
 
-  def cog_unload(self):
-    self.update_stats.cancel()
+#   def cog_unload(self):
+#     self.update_stats.cancel()
 
-  @tasks.loop(minutes=30)
-  async def update_stats(self):
-    """This function runs every 30 minutes to automatically update your server count."""
-    await self.bot.wait_until_ready()
-    try:
-      server_count = len(self.bot.guilds)
-      await self.dblpy.post_guild_count(server_count)
-      print('Posted server count ({})'.format(server_count))
-    except Exception as e:
-      print('Failed to post server count\n{}: {}'.format(type(e).__name__, e))
+#   @tasks.loop(minutes=30)
+#   async def update_stats(self):
+#     """This function runs every 30 minutes to automatically update your server count."""
+#     await self.bot.wait_until_ready()
+#     try:
+#       server_count = len(self.bot.guilds)
+#       await self.dblpy.post_guild_count(server_count)
+#       print('Posted server count ({})'.format(server_count))
+#     except Exception as e:
+#       print('Failed to post server count\n{}: {}'.format(type(e).__name__, e))
 
 
 
-def setup(bot):
-    bot.add_cog(TopGG(bot))
+# def setup(bot):
+#     bot.add_cog(TopGG(bot))
 
 # Testing if it works!
 
@@ -79,7 +79,7 @@ def get_count(client):
   return count
 
 intents = discord.Intents(messages = True , guilds = True , reactions = True)
-client = commands.Bot(command_prefix= get_prefix , intents = intents)
+client = commands.Bot(command_prefix= '!!' , intents = intents)
 client.remove_command('help')
 value = get_count(client)
 status = cycle([f"{value} members" , f"{value} members"])
@@ -226,7 +226,7 @@ async def match(ctx , server:str = ''):
 @client.event
 async def on_ready():
   change_status.start()
-  setup(client)
+  # setup(client)
   print("Bot is ready.")
 
 @tasks.loop(minutes=15)
@@ -727,7 +727,7 @@ async def crewmate(ctx , user : discord.Member = None):
   if user == None:
     user = ctx.author
 
-  impost = Image.open("crewmate.png")
+  impost = Image.open(os.path.join(os.path.dirname(__file__), 'img', 'crewmate.png'))
 
   asset = user.avatar_url_as(format = 'png' , size = 1024)
   data = BytesIO(await asset.read())
@@ -945,6 +945,6 @@ class helper(menus.Menu):
 
 
 
-client.load_extension('./memes/memes')
-TOKEN = os.environ.get('discord_bot_token')
+client.load_extension('memes.memes')
+TOKEN = 'NzYzNzU5MjEwMzk0NTUwMzMy.X38YMQ.aNq1Z2HieEwyP47GOrc-O5Psfpc'
 client.run(TOKEN)
